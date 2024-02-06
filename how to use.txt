@@ -1,0 +1,6 @@
+In case you didn't read the ReadMe instructions, here's a resume :
+
+1. First, you need to run "execute.bat" file to start the server
+2. Open your web browser
+3. Go to localhost:3000. You need to type it in the URL section, similar to when you search for Youtube Page
+4. Convert kanji into furigana!
