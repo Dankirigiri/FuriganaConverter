@@ -1,32 +1,24 @@
 const { findingReadings } = require("./finding_readings");
-const { ordeningReadings } = require("./ordering_readings");
-const { verifyingWord } = require("./verifying_word");
 
 const analyzingText = async text => {
     try{
-        let newText = [];
+        let newText = text;
         let readings = await findingReadings(text);
-        console.log(readings);
         if(readings.length == 0){
-            let word = text.split("");
-            let kanji = await verifyingWord(word);
-            console.log(kanji);
-            readings = await findingReadings(kanji);
-            let orderedReadings = ordeningReadings(readings);
-            let purgeConjugations = orderedReadings.map(reading => {
-                let realWord = []
-                for(let i=0; i<reading.length-1; i++){
-                    if(!reading[i].includes('る')){
-                     realWord.push(reading[i]);
-                    }
-                }
-                return realWord.join("");
-            });
-            newText = text.replace(kanji, purgeConjugations[0]);
-            
+            let readingsDump = [];
+            let index = 0;
+            for(j = 1; j<=text.length; j++){
+                readings = await findingReadings(text.slice(index, j));
+                if(readings.length != 0){
+                    readingsDump[0] = [readings[0][0], readings[0][1]];
+                } else{
+                    index = j;
+                    
+                } 
+                newText = newText.replace(readingsDump[0][0], readingsDump[0][1]);
+            }
         } else{
-            let orderedReadings = ordeningReadings(readings);
-            newText = text.replace(text, orderedReadings[0]);
+            newText = newText.replace(readings[0][0], readings[0][1]);
         }
         return newText;
     } catch(error){
@@ -34,4 +26,4 @@ const analyzingText = async text => {
     }
 }
 
-module.exports = { analyzingText }
+module.exports = {analyzingText}

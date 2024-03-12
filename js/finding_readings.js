@@ -4,29 +4,23 @@ const fs = require("fs");
 const JMDictDir = path.join('JapaneseVocabulary/JMdict_spanish');
 const JMDictFiles = fs.readdirSync(JMDictDir);
 
-const findingReadings = (kanjiword) => {
+const findingReadings = async (kanjiword) => {
     let readingWord = [];
     for(i = 0; i<=JMDictFiles.length-1; i++){
-        fs.readFile(JMDictDir+"/"+JMDictFiles[i], "utf-8", async (err, data) => {
-            if(err) throw err;
-            try {
-                const content = JSON.parse(data);
-                for(i = 0; i <= content.length-1; i++){
-                    if(content[i][0] == kanjiword){
-                        readingWord.push(content[i][1]);
-                    }
-                }
+        try {
+            const content = await fs.promises.readFile(JMDictDir+"/"+JMDictFiles[i], 'utf-8');
+            const data = JSON.parse(content);
+            for (const kanji of data) {
+                if(kanji[0] == kanjiword || kanji[0].includes(kanjiword)){
+                    readingWord.push([kanji[0], kanji[1], kanji[6]]);
+                } 
             }
-            catch (error) {
-                console.error('Error al analizar el contenido del archivo JSON:', error);
-            }
-        });
-    }
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve(readingWord);
-        }, 1000);
-    });
+          } catch (error) {
+            console.error(error.message);
+            return null;
+          }
+        }
+    return readingWord;
 }
 
-module.exports = { findingReadings }
+module.exports = {findingReadings}
